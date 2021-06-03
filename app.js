@@ -3,8 +3,13 @@ const mongoose = require('mongoose')
 const ejsMate = require('ejs-mate')
 const path = require('path')
 const methodOverride = require('method-override')
+
+const flash = require('connect-flash')
+const session = require('express-session')
+
 const Campground = require('./models/campground')
 const Review = require('./models/review')
+
 const campgrounds = require('./routes/campgrounds')
 const reviews = require('./routes/reviews')
 const Joi = require('joi')
@@ -13,9 +18,6 @@ const { campgroundSchema } = require('./schemas.js')
 
 const catchAsync = require('./utils/catchAsync')
 const ExpressError = require('./utils/ExpressError')
-
-const flash = require('connect-flash')
-const session = require('express-session')
 
 mongoose.connect('mongodb+srv://chandana:chandana123@cluster0.flemu.mongodb.net/myFirstDatabase?retryWrites=true&w=majority', {
     useNewUrlParser: true,
@@ -51,6 +53,12 @@ const sessionConfig = {
 
 app.use(session(sessionConfig))
 app.use(flash())
+
+app.use((req, res, next) => {
+    res.locals.success = req.flash("success")
+    res.locals.error = req.flash('error')
+    next()
+})
 
 app.get("/", (req, res) => {
     res.render('home.ejs')
