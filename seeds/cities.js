@@ -8994,9 +8994,6 @@ module.exports = [
         city: "Panama City",
         growth_from_2000_to_2013: "0.1%",
         latitude: 30.1588129,
-        longitude: -85.6602058,
-        population: "36877",
-        rank: "1000",
         state: "Florida",
     },
 ];
