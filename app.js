@@ -9,6 +9,8 @@ const campgrounds = require('./routes/campgrounds')
 const reviews = require('./routes/reviews')
 const Joi = require('joi')
 
+const { campgroundSchema } = require('./schemas.js')
+
 const catchAsync = require('./utils/catchAsync')
 const ExpressError = require('./utils/ExpressError')
 
