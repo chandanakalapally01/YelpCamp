@@ -12,12 +12,19 @@ const Review = require('./models/review')
 
 const campgrounds = require('./routes/campgrounds')
 const reviews = require('./routes/reviews')
+const users = require('./routes/users')
+
 const Joi = require('joi')
+
+const passport = require('passport');
 
 const { campgroundSchema } = require('./schemas.js')
 
 const catchAsync = require('./utils/catchAsync')
 const ExpressError = require('./utils/ExpressError')
+
+require('./config/passport')(passport);
+
 
 mongoose.connect('mongodb+srv://chandana:chandana123@cluster0.flemu.mongodb.net/myFirstDatabase?retryWrites=true&w=majority', {
     useNewUrlParser: true,
@@ -40,6 +47,7 @@ app.set('views', path.join(__dirname, 'views'))
 app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
 
+
 const sessionConfig = {
     secret: 'thisshouldbethebettersecret',
     resave: false,
@@ -54,26 +62,25 @@ const sessionConfig = {
 app.use(session(sessionConfig))
 app.use(flash())
 
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 app.use((req, res, next) => {
     res.locals.success = req.flash("success")
     res.locals.error = req.flash('error')
+    res.locals.currentUser = req.user;
     next()
 })
 
-app.get("/", (req, res) => {
-    res.render('home.ejs')
-})
-//To add dummy data multiple times
-// app.get("/makecampground", async (req, res) => {
-//     const camp = new Campground({
-//         title: "Camps Desert",
-//         price: "5000000",
-//         description: "Dinner with a valentine kinda day"
-//     });
-//     await camp.save()
-//     res.send(camp)
-// })
+app.use(function (req, res, next) {
+    res.locals.success_msg = req.flash('success_msg');
+    res.locals.error_msg = req.flash('error_msg');
+    res.locals.error = req.flash('error');
+    next();
+});
 
+app.use("/", users)
 app.use("/campgrounds", campgrounds)
 app.use("/campgrounds/:id/reviews", reviews)
 
